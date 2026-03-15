@@ -12,18 +12,21 @@ if(document.getElementById("avatar")){
 
     let avatar;
     let loader = new THREE.GLTFLoader();
+
+    // Model sigur Three.js Examples (poate fi schimbat ulterior)
     loader.load(
-      "https://threejs.org/examples/models/gltf/CesiumMan.glb",
+      "https://threejs.org/examples/models/gltf/Flamingo.glb",
       function(gltf){
           avatar = gltf.scene;
-          avatar.scale.set(1,1,1);
-          avatar.position.y = 0;
+          avatar.scale.set(0.01,0.01,0.01); // micșorăm modelul Flamingo pentru canvas
+          avatar.position.y = -0.5;
           scene.add(avatar);
       },
       undefined,
       function(error){ console.error("Error loading model:",error); }
     );
 
+    // Haine simple (cub colorat) pentru demo
     let clothesGeometry = new THREE.BoxGeometry(1.2,1.3,0.7);
     let clothesMaterial = new THREE.MeshBasicMaterial({color:0x3366ff});
     let clothes = new THREE.Mesh(clothesGeometry,clothesMaterial);
@@ -38,6 +41,7 @@ if(document.getElementById("avatar")){
     }
     animate();
 
+    // Funcție pentru scalarea avatarului după măsuri
     window.updateAvatar = function(){
         let chest = parseFloat(document.getElementById("chest").value)||0;
         let waist = parseFloat(document.getElementById("waist").value)||0;
@@ -58,14 +62,15 @@ if(document.getElementById("avatar")){
         document.getElementById("result").innerHTML = "Avatar updated for size: "+size;
     }
 
+    // Funcție schimbare culoare haine
     window.wearClothes = function(color){
         clothes.material.color.set(color);
     }
 }
 
-// Search products
+// Căutare produse
 window.searchProducts = function(){
-    let q = document.getElementById("search").value.toLowerCase();
+    let q = document.getElementById("search")?.value.toLowerCase() || "";
     let allProducts = document.querySelectorAll('.product');
     allProducts.forEach(p=>{
         let name = p.querySelector('p').innerText.toLowerCase();
@@ -73,7 +78,7 @@ window.searchProducts = function(){
     });
 }
 
-// Cart functionality
+// Funcții Cart
 window.addToCart = function(name, price){
     let cart = JSON.parse(localStorage.getItem('cart'))||[];
     cart.push({name:name, price:price});
@@ -108,4 +113,5 @@ window.finishOrder = function(){
     window.location.href = "index.html";
 }
 
+// Load cart la deschidere pagină
 window.addEventListener('load', loadCart);
