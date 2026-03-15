@@ -1,260 +1,129 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-<title>TryFit - Smart Virtual Fitting</title>
-
+<title>TryFit - Smart Virtual Fitting Demo</title>
 <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/GLTFLoader.js"></script>
-
 <style>
-
-body{
-margin:0;
-font-family:Arial;
-background:#f6f6f6;
-text-align:center;
-}
-
-header{
-background:black;
-color:white;
-padding:20px;
-font-size:28px;
-}
-
-.container{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-padding:20px;
-}
-
-.card{
-background:white;
-padding:20px;
-margin:10px;
-border-radius:10px;
-box-shadow:0 0 10px rgba(0,0,0,0.1);
-}
-
-input,select{
-padding:8px;
-margin:5px;
-width:180px;
-}
-
-button{
-padding:10px 20px;
-background:black;
-color:white;
-border:none;
-cursor:pointer;
-margin-top:10px;
-}
-
-canvas{
-border:1px solid #ddd;
-}
-
-.products{
-display:flex;
-justify-content:center;
-flex-wrap:wrap;
-}
-
-.product{
-background:white;
-padding:15px;
-margin:10px;
-border-radius:10px;
-box-shadow:0 0 8px rgba(0,0,0,0.1);
-width:180px;
-}
-
-.product img{
-width:100%;
-border-radius:8px;
-}
-
+body{margin:0;font-family:Arial;background:#f6f6f6;text-align:center;}
+header{background:black;color:white;padding:20px;font-size:28px;}
+.container{display:flex;flex-wrap:wrap;justify-content:center;padding:20px;}
+.card{background:white;padding:20px;margin:10px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
+input,select{padding:8px;margin:5px;width:180px;}
+button{padding:10px 20px;background:black;color:white;border:none;cursor:pointer;margin-top:10px;}
+canvas{border:1px solid #ddd;}
+.products{display:flex;justify-content:center;flex-wrap:wrap;}
+.product{background:white;padding:15px;margin:10px;border-radius:10px;box-shadow:0 0 8px rgba(0,0,0,0.1);width:180px;}
+.product img{width:100%;border-radius:8px;}
+#result{margin-top:10px;font-weight:bold;}
 </style>
-
 </head>
-
 <body>
 
-<header>TryFit Virtual Fitting</header>
+<header>TryFit Virtual Fitting Demo</header>
 
 <div class="container">
-
 <div class="card">
-
-<h3>Your Measurements</h3>
-
-Chest<br>
-<input id="chest"><br>
-
-Waist<br>
-<input id="waist"><br>
-
-Hips<br>
-<input id="hips"><br>
-
+<h3>Your Body</h3>
+Chest<br><input id="chest"><br>
+Waist<br><input id="waist"><br>
+Hips<br><input id="hips"><br>
 Size<br>
-
-<select id="size">
-<option>S</option>
-<option>M</option>
-<option>L</option>
-</select>
-
+<select id="size"><option>S</option><option>M</option><option>L</option></select>
 <br>
-
 <button onclick="updateAvatar()">Update Avatar</button>
-
+<div id="result"></div>
 </div>
 
 <div class="card">
-
 <h3>Avatar Preview</h3>
-
 <canvas id="avatar" width="400" height="400"></canvas>
-
 </div>
-
 </div>
 
 <h2>Products</h2>
-
 <div class="products">
-
 <div class="product">
 <img src="https://images.unsplash.com/photo-1520975928318-8b3d7c5b3a7e">
 <p>T-Shirt</p>
 <button onclick="wearClothes(0x3366ff)">Try On</button>
 </div>
-
 <div class="product">
 <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f">
 <p>Dress</p>
 <button onclick="wearClothes(0xff6699)">Try On</button>
 </div>
-
 <div class="product">
 <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d">
 <p>Hoodie</p>
 <button onclick="wearClothes(0x444444)">Try On</button>
 </div>
+</div>
 
+<div class="container">
+<input id="search" placeholder="Search products...">
+<button onclick="searchProducts()">Search</button>
 </div>
 
 <script>
-
+// 3D Scene
 let scene = new THREE.Scene()
-
-let camera = new THREE.PerspectiveCamera(
-75,
-400/400,
-0.1,
-1000
-)
-
-let renderer = new THREE.WebGLRenderer({
-canvas:document.getElementById("avatar"),
-alpha:true
-})
-
+let camera = new THREE.PerspectiveCamera(75,400/400,0.1,1000)
+let renderer = new THREE.WebGLRenderer({canvas:document.getElementById("avatar"),alpha:true})
 renderer.setSize(400,400)
-
 let light = new THREE.HemisphereLight(0xffffff,0x444444)
 scene.add(light)
-
 camera.position.set(0,1.6,3)
 
 let avatar
-
 let loader = new THREE.GLTFLoader()
-
-loader.load(
-
-"https://models.readyplayer.me/64e0b9fbb1c8c6c0c6e3a6f5.glb",
-
+loader.load("https://models.readyplayer.me/64e0b9fbb1c8c6c0c6e3a6f5.glb",
 function(gltf){
-
 avatar = gltf.scene
 scene.add(avatar)
-
-}
-
-)
-
-let clothes
+})
 
 let clothesGeometry = new THREE.BoxGeometry(1.1,1.2,0.6)
 let clothesMaterial = new THREE.MeshBasicMaterial({color:0x3366ff})
-
-clothes = new THREE.Mesh(clothesGeometry,clothesMaterial)
-clothes.position.y = 1
-
+let clothes = new THREE.Mesh(clothesGeometry,clothesMaterial)
+clothes.position.y=1
 scene.add(clothes)
 
 function animate(){
-
 requestAnimationFrame(animate)
-
-if(avatar){
-avatar.rotation.y += 0.01
-}
-
-clothes.rotation.y += 0.01
-
+if(avatar) avatar.rotation.y+=0.01
+clothes.rotation.y+=0.01
 renderer.render(scene,camera)
-
 }
-
 animate()
 
 function updateAvatar(){
-
 let chest = document.getElementById("chest").value
 let waist = document.getElementById("waist").value
 let size = document.getElementById("size").value
-
 let scaleX = 1 + chest/200
 let scaleY = 1 + waist/300
-
-if(avatar){
-
-avatar.scale.set(scaleX,scaleY,1)
-
-}
-
-if(size=="S"){
-clothes.scale.set(0.9,0.9,0.9)
-}
-
-if(size=="M"){
-clothes.scale.set(1,1,1)
-}
-
-if(size=="L"){
-clothes.scale.set(1.15,1.15,1.15)
-}
-
+if(avatar) avatar.scale.set(scaleX,scaleY,1)
+if(size=="S") clothes.scale.set(0.9,0.9,0.9)
+if(size=="M") clothes.scale.set(1,1,1)
+if(size=="L") clothes.scale.set(1.15,1.15,1.15)
+document.getElementById("result").innerHTML = "Avatar updated for size: "+size
 }
 
 function wearClothes(color){
-
 clothes.material.color.set(color)
-
 }
 
+function searchProducts(){
+let q=document.getElementById("search").value.toLowerCase()
+let allProducts = document.querySelectorAll('.product')
+allProducts.forEach(p=>{
+let name = p.querySelector('p').innerText.toLowerCase()
+p.style.display = name.includes(q)?'block':'none'
+})
+}
 </script>
 
 </body>
-
 </html>
-```
