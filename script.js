@@ -6,20 +6,22 @@ if(document.getElementById("avatar")){
     let camera = new THREE.PerspectiveCamera(75, 400/400, 0.1, 1000);
     let renderer = new THREE.WebGLRenderer({canvas: document.getElementById("avatar"), alpha: true});
     renderer.setSize(400, 400);
+
     let light = new THREE.HemisphereLight(0xffffff, 0x444444);
     scene.add(light);
+
     camera.position.set(0, 1.5, 3);
 
     let avatar;
     let loader = new THREE.GLTFLoader();
 
-    // Model sigur Three.js (Flamingo pentru test)
+    // Încarcă fișierul tău .glb din repository
     loader.load(
-        "https://threejs.org/examples/models/gltf/Flamingo.glb",
+        "avatar.glb",  // fișierul tău .glb încărcat pe GitHub
         function(gltf){
             avatar = gltf.scene;
-            avatar.scale.set(0.01, 0.01, 0.01); // micșorăm modelul Flamingo pentru canvas
-            avatar.position.y = -0.5;
+            avatar.scale.set(1, 1, 1);  // ajustează dacă e prea mare/mic
+            avatar.position.y = 0;      // ajustează poziția dacă e nevoie
             scene.add(avatar);
         },
         undefined,
