@@ -2,33 +2,46 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TryFit - Virtual Fitting Demo</title>
 <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/GLTFLoader.js"></script>
 <style>
-body{margin:0;font-family:Arial;background:#f6f6f6;text-align:center;}
-header{background:black;color:white;padding:20px;font-size:28px;}
+body{margin:0;font-family:Arial,sans-serif;background:#f6f6f6;}
+header{background:black;color:white;padding:20px;font-size:24px;text-align:center;}
+nav{background:#333;padding:10px;text-align:center;}
+nav a{color:white;text-decoration:none;margin:0 15px;font-weight:bold;}
+nav a:hover{text-decoration:underline;}
 .container{display:flex;flex-wrap:wrap;justify-content:center;padding:20px;}
 .card{background:white;padding:20px;margin:10px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
 input,select{padding:8px;margin:5px;width:180px;}
 button{padding:10px 20px;background:black;color:white;border:none;cursor:pointer;margin-top:10px;}
-canvas{border:1px solid #ddd;}
+button:hover{opacity:0.9;}
+canvas{border:1px solid #ddd;border-radius:10px;}
 .products{display:flex;justify-content:center;flex-wrap:wrap;}
 .product{background:white;padding:15px;margin:10px;border-radius:10px;box-shadow:0 0 8px rgba(0,0,0,0.1);width:180px;}
 .product img{width:100%;border-radius:8px;}
 #result{margin-top:10px;font-weight:bold;}
+footer{background:#222;color:white;text-align:center;padding:15px;margin-top:30px;}
 </style>
 </head>
 <body>
 
 <header>TryFit Virtual Fitting Demo</header>
 
+<nav>
+  <a href="#">Home</a>
+  <a href="#">Products</a>
+  <a href="#">Cart</a>
+  <a href="#">Contact</a>
+</nav>
+
 <div class="container">
   <div class="card">
     <h3>Your Body</h3>
-    Chest<br><input id="chest"><br>
-    Waist<br><input id="waist"><br>
-    Hips<br><input id="hips"><br>
+    Chest (cm)<br><input id="chest" type="number"><br>
+    Waist (cm)<br><input id="waist" type="number"><br>
+    Hips (cm)<br><input id="hips" type="number"><br>
     Size<br>
     <select id="size"><option>S</option><option>M</option><option>L</option></select><br>
     <button onclick="updateAvatar()">Update Avatar</button>
@@ -41,20 +54,20 @@ canvas{border:1px solid #ddd;}
   </div>
 </div>
 
-<h2>Products</h2>
-<div class="products">
+<h2 style="text-align:center;">Products</h2>
+<div class="products" id="productList">
   <div class="product">
-    <img src="https://images.unsplash.com/photo-1520975928318-8b3d7c5b3a7e">
+    <img src="https://images.unsplash.com/photo-1520975928318-8b3d7c5b3a7e" alt="T-Shirt">
     <p>T-Shirt</p>
     <button onclick="wearClothes(0x3366ff)">Try On</button>
   </div>
   <div class="product">
-    <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f">
+    <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f" alt="Dress">
     <p>Dress</p>
     <button onclick="wearClothes(0xff6699)">Try On</button>
   </div>
   <div class="product">
-    <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d">
+    <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d" alt="Hoodie">
     <p>Hoodie</p>
     <button onclick="wearClothes(0x444444)">Try On</button>
   </div>
@@ -65,65 +78,83 @@ canvas{border:1px solid #ddd;}
   <button onclick="searchProducts()">Search</button>
 </div>
 
+<footer>© 2026 TryFit Demo | All Rights Reserved</footer>
+
 <script>
-// 3D Scene
-let scene = new THREE.Scene()
-let camera = new THREE.PerspectiveCamera(75,400/400,0.1,1000)
-let renderer = new THREE.WebGLRenderer({canvas:document.getElementById("avatar"),alpha:true})
-renderer.setSize(400,400)
-let light = new THREE.HemisphereLight(0xffffff,0x444444)
-scene.add(light)
-camera.position.set(0,1.5,3)
+// 3D Scene setup
+let scene = new THREE.Scene();
+let camera = new THREE.PerspectiveCamera(75,400/400,0.1,1000);
+let renderer = new THREE.WebGLRenderer({canvas:document.getElementById("avatar"),alpha:true});
+renderer.setSize(400,400);
+let light = new THREE.HemisphereLight(0xffffff,0x444444);
+scene.add(light);
+camera.position.set(0,1.5,3);
 
-let avatar
-let loader = new THREE.GLTFLoader()
-// Model gratuit sigur
-loader.load("https://threejs.org/examples/models/gltf/Flamingo.glb",
-function(gltf){
-    avatar = gltf.scene
-    avatar.scale.set(0.01,0.01,0.01)
-    avatar.position.y = -0.5
-    scene.add(avatar)
-})
+// Load human avatar model
+let avatar;
+let loader = new THREE.GLTFLoader();
+loader.load(
+  "https://threejs.org/examples/models/gltf/CesiumMan.glb",
+  function(gltf){
+      avatar = gltf.scene;
+      avatar.scale.set(1,1,1);
+      avatar.position.y = 0;
+      scene.add(avatar);
+  },
+  undefined,
+  function(error){ console.error("Error loading model:",error); }
+);
 
-let clothesGeometry = new THREE.BoxGeometry(1.1,1.2,0.6)
-let clothesMaterial = new THREE.MeshBasicMaterial({color:0x3366ff})
-let clothes = new THREE.Mesh(clothesGeometry,clothesMaterial)
-clothes.position.y = 0.1
-scene.add(clothes)
+// Simple clothes mesh
+let clothesGeometry = new THREE.BoxGeometry(1.2,1.3,0.7);
+let clothesMaterial = new THREE.MeshBasicMaterial({color:0x3366ff});
+let clothes = new THREE.Mesh(clothesGeometry,clothesMaterial);
+clothes.position.y = 1.0;
+scene.add(clothes);
 
+// Animate scene
 function animate(){
-    requestAnimationFrame(animate)
-    if(avatar) avatar.rotation.y += 0.01
-    clothes.rotation.y += 0.01
-    renderer.render(scene,camera)
+    requestAnimationFrame(animate);
+    if(avatar) avatar.rotation.y += 0.01;
+    clothes.rotation.y += 0.01;
+    renderer.render(scene,camera);
 }
-animate()
+animate();
 
+// Update avatar scaling
 function updateAvatar(){
-    let chest = document.getElementById("chest").value
-    let waist = document.getElementById("waist").value
-    let size = document.getElementById("size").value
-    let scaleX = 1 + chest/200
-    let scaleY = 1 + waist/300
-    if(avatar) avatar.scale.set(scaleX,scaleY,scaleX)
-    if(size=="S") clothes.scale.set(0.9,0.9,0.9)
-    if(size=="M") clothes.scale.set(1,1,1)
-    if(size=="L") clothes.scale.set(1.15,1.15,1.15)
-    document.getElementById("result").innerHTML = "Avatar updated for size: "+size
+    let chest = parseFloat(document.getElementById("chest").value)||0;
+    let waist = parseFloat(document.getElementById("waist").value)||0;
+    let hips = parseFloat(document.getElementById("hips").value)||0;
+    let size = document.getElementById("size").value;
+
+    if(avatar){
+        let scaleX = 1 + chest/200;
+        let scaleY = 1 + waist/300;
+        let scaleZ = 1 + hips/200;
+        avatar.scale.set(scaleX, scaleY, scaleZ);
+    }
+
+    if(size=="S") clothes.scale.set(0.9,0.9,0.9);
+    if(size=="M") clothes.scale.set(1,1,1);
+    if(size=="L") clothes.scale.set(1.15,1.15,1.15);
+
+    document.getElementById("result").innerHTML = "Avatar updated for size: "+size;
 }
 
+// Wear clothes
 function wearClothes(color){
-    clothes.material.color.set(color)
+    clothes.material.color.set(color);
 }
 
+// Search products
 function searchProducts(){
-    let q=document.getElementById("search").value.toLowerCase()
-    let allProducts = document.querySelectorAll('.product')
+    let q = document.getElementById("search").value.toLowerCase();
+    let allProducts = document.querySelectorAll('.product');
     allProducts.forEach(p=>{
-        let name = p.querySelector('p').innerText.toLowerCase()
-        p.style.display = name.includes(q)?'block':'none'
-    })
+        let name = p.querySelector('p').innerText.toLowerCase();
+        p.style.display = name.includes(q)?'block':'none';
+    });
 }
 </script>
 
