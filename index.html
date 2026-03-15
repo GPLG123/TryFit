@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>TryFit - Smart Virtual Fitting Demo</title>
+<title>TryFit - Virtual Fitting Demo</title>
 <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/GLTFLoader.js"></script>
 <style>
@@ -24,46 +24,45 @@ canvas{border:1px solid #ddd;}
 <header>TryFit Virtual Fitting Demo</header>
 
 <div class="container">
-<div class="card">
-<h3>Your Body</h3>
-Chest<br><input id="chest"><br>
-Waist<br><input id="waist"><br>
-Hips<br><input id="hips"><br>
-Size<br>
-<select id="size"><option>S</option><option>M</option><option>L</option></select>
-<br>
-<button onclick="updateAvatar()">Update Avatar</button>
-<div id="result"></div>
-</div>
+  <div class="card">
+    <h3>Your Body</h3>
+    Chest<br><input id="chest"><br>
+    Waist<br><input id="waist"><br>
+    Hips<br><input id="hips"><br>
+    Size<br>
+    <select id="size"><option>S</option><option>M</option><option>L</option></select><br>
+    <button onclick="updateAvatar()">Update Avatar</button>
+    <div id="result"></div>
+  </div>
 
-<div class="card">
-<h3>Avatar Preview</h3>
-<canvas id="avatar" width="400" height="400"></canvas>
-</div>
+  <div class="card">
+    <h3>Avatar Preview</h3>
+    <canvas id="avatar" width="400" height="400"></canvas>
+  </div>
 </div>
 
 <h2>Products</h2>
 <div class="products">
-<div class="product">
-<img src="https://images.unsplash.com/photo-1520975928318-8b3d7c5b3a7e">
-<p>T-Shirt</p>
-<button onclick="wearClothes(0x3366ff)">Try On</button>
-</div>
-<div class="product">
-<img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f">
-<p>Dress</p>
-<button onclick="wearClothes(0xff6699)">Try On</button>
-</div>
-<div class="product">
-<img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d">
-<p>Hoodie</p>
-<button onclick="wearClothes(0x444444)">Try On</button>
-</div>
+  <div class="product">
+    <img src="https://images.unsplash.com/photo-1520975928318-8b3d7c5b3a7e">
+    <p>T-Shirt</p>
+    <button onclick="wearClothes(0x3366ff)">Try On</button>
+  </div>
+  <div class="product">
+    <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f">
+    <p>Dress</p>
+    <button onclick="wearClothes(0xff6699)">Try On</button>
+  </div>
+  <div class="product">
+    <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d">
+    <p>Hoodie</p>
+    <button onclick="wearClothes(0x444444)">Try On</button>
+  </div>
 </div>
 
 <div class="container">
-<input id="search" placeholder="Search products...">
-<button onclick="searchProducts()">Search</button>
+  <input id="search" placeholder="Search products...">
+  <button onclick="searchProducts()">Search</button>
 </div>
 
 <script>
@@ -74,54 +73,57 @@ let renderer = new THREE.WebGLRenderer({canvas:document.getElementById("avatar")
 renderer.setSize(400,400)
 let light = new THREE.HemisphereLight(0xffffff,0x444444)
 scene.add(light)
-camera.position.set(0,1.6,3)
+camera.position.set(0,1.5,3)
 
 let avatar
 let loader = new THREE.GLTFLoader()
-loader.load("https://models.readyplayer.me/64e0b9fbb1c8c6c0c6e3a6f5.glb",
+// Model gratuit sigur
+loader.load("https://threejs.org/examples/models/gltf/Flamingo.glb",
 function(gltf){
-avatar = gltf.scene
-scene.add(avatar)
+    avatar = gltf.scene
+    avatar.scale.set(0.01,0.01,0.01)
+    avatar.position.y = -0.5
+    scene.add(avatar)
 })
 
 let clothesGeometry = new THREE.BoxGeometry(1.1,1.2,0.6)
 let clothesMaterial = new THREE.MeshBasicMaterial({color:0x3366ff})
 let clothes = new THREE.Mesh(clothesGeometry,clothesMaterial)
-clothes.position.y=1
+clothes.position.y = 0.1
 scene.add(clothes)
 
 function animate(){
-requestAnimationFrame(animate)
-if(avatar) avatar.rotation.y+=0.01
-clothes.rotation.y+=0.01
-renderer.render(scene,camera)
+    requestAnimationFrame(animate)
+    if(avatar) avatar.rotation.y += 0.01
+    clothes.rotation.y += 0.01
+    renderer.render(scene,camera)
 }
 animate()
 
 function updateAvatar(){
-let chest = document.getElementById("chest").value
-let waist = document.getElementById("waist").value
-let size = document.getElementById("size").value
-let scaleX = 1 + chest/200
-let scaleY = 1 + waist/300
-if(avatar) avatar.scale.set(scaleX,scaleY,1)
-if(size=="S") clothes.scale.set(0.9,0.9,0.9)
-if(size=="M") clothes.scale.set(1,1,1)
-if(size=="L") clothes.scale.set(1.15,1.15,1.15)
-document.getElementById("result").innerHTML = "Avatar updated for size: "+size
+    let chest = document.getElementById("chest").value
+    let waist = document.getElementById("waist").value
+    let size = document.getElementById("size").value
+    let scaleX = 1 + chest/200
+    let scaleY = 1 + waist/300
+    if(avatar) avatar.scale.set(scaleX,scaleY,scaleX)
+    if(size=="S") clothes.scale.set(0.9,0.9,0.9)
+    if(size=="M") clothes.scale.set(1,1,1)
+    if(size=="L") clothes.scale.set(1.15,1.15,1.15)
+    document.getElementById("result").innerHTML = "Avatar updated for size: "+size
 }
 
 function wearClothes(color){
-clothes.material.color.set(color)
+    clothes.material.color.set(color)
 }
 
 function searchProducts(){
-let q=document.getElementById("search").value.toLowerCase()
-let allProducts = document.querySelectorAll('.product')
-allProducts.forEach(p=>{
-let name = p.querySelector('p').innerText.toLowerCase()
-p.style.display = name.includes(q)?'block':'none'
-})
+    let q=document.getElementById("search").value.toLowerCase()
+    let allProducts = document.querySelectorAll('.product')
+    allProducts.forEach(p=>{
+        let name = p.querySelector('p').innerText.toLowerCase()
+        p.style.display = name.includes(q)?'block':'none'
+    })
 }
 </script>
 
