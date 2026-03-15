@@ -1,16 +1,18 @@
-// script.js - comun pentru toate paginile
+// script.js - complet, optimizat pentru vizualizare avatar
 
 // Avatar 3D (doar pe index.html)
 if (document.getElementById("avatar")) {
-    // Scene, camera, renderer
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, 400 / 400, 0.1, 1000);
-    camera.position.set(0, 1.5, 5); // mai departe ca modelul să fie vizibil
+    camera.position.set(0, 1.5, 5); // camera puțin mai în spate
 
-    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("avatar"), alpha: true });
+    const renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById("avatar"),
+        alpha: true
+    });
     renderer.setSize(400, 400);
 
-    // Lumină
+    // Lumini
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
     scene.add(hemiLight);
 
@@ -18,11 +20,19 @@ if (document.getElementById("avatar")) {
     dirLight.position.set(5, 10, 7.5);
     scene.add(dirLight);
 
-    // Optional: helper pentru debugging poziție
-    // let axes = new THREE.AxesHelper(5);
-    // scene.add(axes);
+    // AxesHelper pentru debugging
+    const axes = new THREE.AxesHelper(5);
+    scene.add(axes);
 
-    // Loader pentru .glb
+    // Cub de test pentru vizualizare scena
+    const testCube = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 1, 1),
+        new THREE.MeshNormalMaterial()
+    );
+    testCube.position.y = 0;
+    scene.add(testCube);
+
+    // Loader GLTF
     let avatar;
     const loader = new THREE.GLTFLoader();
 
@@ -30,10 +40,9 @@ if (document.getElementById("avatar")) {
         "avatar.glb",
         function (gltf) {
             avatar = gltf.scene;
-
             // Ajustează dimensiunea și poziția după nevoie
-            avatar.scale.set(2, 2, 2);   // mărește modelul
-            avatar.position.y = -1;      // ajustează pivot-ul
+            avatar.scale.set(2, 2, 2);  // crește dacă e mic
+            avatar.position.y = -1;     // ajustează pivot
             scene.add(avatar);
         },
         undefined,
@@ -43,7 +52,7 @@ if (document.getElementById("avatar")) {
         }
     );
 
-    // Haine demo (cub)
+    // Haine demo (cub colorat)
     const clothesGeometry = new THREE.BoxGeometry(1.2, 1.3, 0.7);
     const clothesMaterial = new THREE.MeshBasicMaterial({ color: 0x3366ff });
     const clothes = new THREE.Mesh(clothesGeometry, clothesMaterial);
