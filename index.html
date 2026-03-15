@@ -3,15 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TryFit - Virtual Fitting Demo</title>
+<title>TryFit - Virtual Fitting Store</title>
 <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/GLTFLoader.js"></script>
 <style>
 body{margin:0;font-family:Arial,sans-serif;background:#f6f6f6;}
 header{background:black;color:white;padding:20px;font-size:24px;text-align:center;}
-nav{background:#333;padding:10px;text-align:center;}
+nav{background:#333;padding:10px;text-align:center;position:sticky;top:0;z-index:100;}
 nav a{color:white;text-decoration:none;margin:0 15px;font-weight:bold;}
 nav a:hover{text-decoration:underline;}
+section{padding:40px 20px;}
 .container{display:flex;flex-wrap:wrap;justify-content:center;padding:20px;}
 .card{background:white;padding:20px;margin:10px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
 input,select{padding:8px;margin:5px;width:180px;}
@@ -21,67 +22,92 @@ canvas{border:1px solid #ddd;border-radius:10px;}
 .products{display:flex;justify-content:center;flex-wrap:wrap;}
 .product{background:white;padding:15px;margin:10px;border-radius:10px;box-shadow:0 0 8px rgba(0,0,0,0.1);width:180px;}
 .product img{width:100%;border-radius:8px;}
-#result{margin-top:10px;font-weight:bold;}
 footer{background:#222;color:white;text-align:center;padding:15px;margin-top:30px;}
+#result{margin-top:10px;font-weight:bold;}
+ul{list-style:none;padding:0;}
+li{padding:5px 0;}
 </style>
 </head>
 <body>
 
-<header>TryFit Virtual Fitting Demo</header>
-
+<header>TryFit Virtual Fitting Store</header>
 <nav>
-  <a href="#">Home</a>
-  <a href="#">Products</a>
-  <a href="#">Cart</a>
-  <a href="#">Contact</a>
+  <a href="#home">Home</a>
+  <a href="#products">Products</a>
+  <a href="#cart">Cart</a>
+  <a href="#checkout">Checkout</a>
 </nav>
 
-<div class="container">
-  <div class="card">
-    <h3>Your Body</h3>
-    Chest (cm)<br><input id="chest" type="number"><br>
-    Waist (cm)<br><input id="waist" type="number"><br>
-    Hips (cm)<br><input id="hips" type="number"><br>
-    Size<br>
-    <select id="size"><option>S</option><option>M</option><option>L</option></select><br>
-    <button onclick="updateAvatar()">Update Avatar</button>
-    <div id="result"></div>
+<!-- HOME / Avatar -->
+<section id="home">
+  <h2 style="text-align:center;">Your Virtual Avatar</h2>
+  <div class="container">
+    <div class="card">
+      <h3>Your Body</h3>
+      Chest (cm)<br><input id="chest" type="number"><br>
+      Waist (cm)<br><input id="waist" type="number"><br>
+      Hips (cm)<br><input id="hips" type="number"><br>
+      Size<br>
+      <select id="size"><option>S</option><option>M</option><option>L</option></select><br>
+      <button onclick="updateAvatar()">Update Avatar</button>
+      <div id="result"></div>
+    </div>
+    <div class="card">
+      <h3>Avatar Preview</h3>
+      <canvas id="avatar" width="400" height="400"></canvas>
+    </div>
   </div>
+</section>
 
-  <div class="card">
-    <h3>Avatar Preview</h3>
-    <canvas id="avatar" width="400" height="400"></canvas>
+<!-- PRODUCTS -->
+<section id="products">
+  <h2 style="text-align:center;">Products</h2>
+  <div class="container">
+    <input id="search" placeholder="Search products...">
+    <button onclick="searchProducts()">Search</button>
   </div>
-</div>
+  <div class="products" id="productList">
+    <div class="product">
+      <img src="https://images.unsplash.com/photo-1520975928318-8b3d7c5b3a7e" alt="T-Shirt">
+      <p>T-Shirt</p>
+      <button onclick="wearClothes(0x3366ff); addToCart('T-Shirt',20)">Try On & Add</button>
+    </div>
+    <div class="product">
+      <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f" alt="Dress">
+      <p>Dress</p>
+      <button onclick="wearClothes(0xff6699); addToCart('Dress',40)">Try On & Add</button>
+    </div>
+    <div class="product">
+      <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d" alt="Hoodie">
+      <p>Hoodie</p>
+      <button onclick="wearClothes(0x444444); addToCart('Hoodie',35)">Try On & Add</button>
+    </div>
+  </div>
+</section>
 
-<h2 style="text-align:center;">Products</h2>
-<div class="products" id="productList">
-  <div class="product">
-    <img src="https://images.unsplash.com/photo-1520975928318-8b3d7c5b3a7e" alt="T-Shirt">
-    <p>T-Shirt</p>
-    <button onclick="wearClothes(0x3366ff)">Try On</button>
+<!-- CART -->
+<section id="cart">
+  <h2 style="text-align:center;">Your Cart</h2>
+  <div class="container">
+    <ul id="cartList"></ul>
+    <h3 id="totalPrice"></h3>
+    <button onclick="goCheckout()">Checkout</button>
   </div>
-  <div class="product">
-    <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f" alt="Dress">
-    <p>Dress</p>
-    <button onclick="wearClothes(0xff6699)">Try On</button>
-  </div>
-  <div class="product">
-    <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d" alt="Hoodie">
-    <p>Hoodie</p>
-    <button onclick="wearClothes(0x444444)">Try On</button>
-  </div>
-</div>
+</section>
 
-<div class="container">
-  <input id="search" placeholder="Search products...">
-  <button onclick="searchProducts()">Search</button>
-</div>
+<!-- CHECKOUT -->
+<section id="checkout">
+  <h2 style="text-align:center;">Checkout</h2>
+  <div class="container">
+    <p>Thank you for your order! This is a demo checkout.</p>
+    <button onclick="finishOrder()">Finish Order</button>
+  </div>
+</section>
 
-<footer>© 2026 TryFit Demo | All Rights Reserved</footer>
+<footer>© 2026 TryFit | All Rights Reserved</footer>
 
 <script>
-// 3D Scene setup
+// 3D Avatar Setup
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(75,400/400,0.1,1000);
 let renderer = new THREE.WebGLRenderer({canvas:document.getElementById("avatar"),alpha:true});
@@ -90,7 +116,6 @@ let light = new THREE.HemisphereLight(0xffffff,0x444444);
 scene.add(light);
 camera.position.set(0,1.5,3);
 
-// Load human avatar model
 let avatar;
 let loader = new THREE.GLTFLoader();
 loader.load(
@@ -105,14 +130,12 @@ loader.load(
   function(error){ console.error("Error loading model:",error); }
 );
 
-// Simple clothes mesh
 let clothesGeometry = new THREE.BoxGeometry(1.2,1.3,0.7);
 let clothesMaterial = new THREE.MeshBasicMaterial({color:0x3366ff});
 let clothes = new THREE.Mesh(clothesGeometry,clothesMaterial);
 clothes.position.y = 1.0;
 scene.add(clothes);
 
-// Animate scene
 function animate(){
     requestAnimationFrame(animate);
     if(avatar) avatar.rotation.y += 0.01;
@@ -121,7 +144,7 @@ function animate(){
 }
 animate();
 
-// Update avatar scaling
+// Avatar scaling
 function updateAvatar(){
     let chest = parseFloat(document.getElementById("chest").value)||0;
     let waist = parseFloat(document.getElementById("waist").value)||0;
@@ -156,6 +179,42 @@ function searchProducts(){
         p.style.display = name.includes(q)?'block':'none';
     });
 }
+
+// Cart functionality
+function addToCart(name, price){
+    let cart = JSON.parse(localStorage.getItem('cart'))||[];
+    cart.push({name:name, price:price});
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert(name + " added to cart!");
+    loadCart();
+}
+
+function loadCart(){
+    let cart = JSON.parse(localStorage.getItem('cart'))||[];
+    let cartList = document.getElementById('cartList');
+    cartList.innerHTML = '';
+    let total = 0;
+    cart.forEach(item=>{
+        let li = document.createElement('li');
+        li.innerText = item.name + " - £" + item.price;
+        cartList.appendChild(li);
+        total += item.price;
+    });
+    document.getElementById('totalPrice').innerText = "Total: £"+total;
+}
+
+function goCheckout(){
+    window.location.href = "#checkout";
+}
+
+function finishOrder(){
+    localStorage.removeItem('cart');
+    alert("Order finished! Cart cleared.");
+    window.location.href = "#home";
+}
+
+// Load cart on start
+loadCart();
 </script>
 
 </body>
