@@ -1,19 +1,21 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
 
 <meta charset="UTF-8">
-<title>TryFit - Smart Virtual Fitting</title>
+<title>TryFit - Virtual Fitting</title>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
 
 <style>
 
 body{
-margin:0;
 font-family:Arial;
-background:#f6f6f6;
+margin:0;
+background:#f5f5f5;
+text-align:center;
 }
 
 header{
@@ -21,19 +23,6 @@ background:black;
 color:white;
 padding:20px;
 font-size:28px;
-text-align:center;
-}
-
-nav{
-background:#222;
-color:white;
-padding:10px;
-text-align:center;
-}
-
-nav span{
-margin:0 15px;
-cursor:pointer;
 }
 
 .container{
@@ -51,7 +40,7 @@ border-radius:10px;
 box-shadow:0 0 10px rgba(0,0,0,0.1);
 }
 
-input{
+input, select{
 padding:8px;
 margin:5px;
 width:200px;
@@ -63,22 +52,19 @@ background:black;
 color:white;
 border:none;
 cursor:pointer;
-}
-
-canvas{
-border:1px solid #ddd;
+margin-top:10px;
 }
 
 .products{
 display:flex;
-flex-wrap:wrap;
 justify-content:center;
+flex-wrap:wrap;
 }
 
 .product{
 background:white;
-padding:15px;
 margin:10px;
+padding:15px;
 border-radius:10px;
 box-shadow:0 0 8px rgba(0,0,0,0.1);
 width:200px;
@@ -89,9 +75,8 @@ width:100%;
 border-radius:8px;
 }
 
-#result{
-margin-top:10px;
-font-weight:bold;
+canvas{
+border:1px solid #ddd;
 }
 
 </style>
@@ -100,27 +85,16 @@ font-weight:bold;
 
 <body>
 
-<header>
-TryFit
-</header>
-
-<nav>
-<span>Home</span>
-<span>Products</span>
-<span>Virtual Try On</span>
-</nav>
+<header>TryFit Virtual Fitting</header>
 
 <div class="container">
 
 <div class="card">
 
-<h3>Your Body Measurements</h3>
+<h3>Your Body</h3>
 
 Height<br>
 <input id="height"><br>
-
-Weight<br>
-<input id="weight"><br>
 
 Chest<br>
 <input id="chest"><br>
@@ -131,15 +105,22 @@ Waist<br>
 Hips<br>
 <input id="hips"><br>
 
-<button onclick="predictSize()">Find Size</button>
+Size<br>
+<select id="size">
+<option>S</option>
+<option>M</option>
+<option>L</option>
+</select>
 
-<div id="result"></div>
+<br>
+
+<button onclick="updateAvatar()">Update Avatar</button>
 
 </div>
 
 <div class="card">
 
-<h3>TryFit Avatar</h3>
+<h3>Avatar</h3>
 
 <canvas id="avatar" width="350" height="350"></canvas>
 
@@ -147,117 +128,27 @@ Hips<br>
 
 </div>
 
-<h2 style="text-align:center">Products</h2>
+<h2>Products</h2>
 
 <div class="products">
 
 <div class="product">
-
 <img src="https://images.unsplash.com/photo-1520975928318-8b3d7c5b3a7e">
-
-<p>Classic T-Shirt</p>
-
-<button onclick="applyClothes(0x3366ff)">Try On</button>
-
+<p>T-Shirt</p>
+<button onclick="wearClothes(0x3366ff)">Try On</button>
 </div>
 
 <div class="product">
-
 <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f">
-
-<p>Summer Dress</p>
-
-<button onclick="applyClothes(0xff6699)">Try On</button>
-
+<p>Dress</p>
+<button onclick="wearClothes(0xff6699)">Try On</button>
 </div>
 
 <div class="product">
-
 <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d">
-
-<p>Casual Hoodie</p>
-
-<button onclick="applyClothes(0x444444)">Try On</button>
-
+<p>Hoodie</p>
+<button onclick="wearClothes(0x444444)">Try On</button>
 </div>
 
-</div>
-
-<script>
-
-let scene=new THREE.Scene()
-
-let camera=new THREE.PerspectiveCamera(
-75,
-350/350,
-0.1,
-1000
-)
-
-let renderer=new THREE.WebGLRenderer({
-canvas:document.getElementById("avatar")
-})
-
-renderer.setSize(350,350)
-
-let geometry=new THREE.BoxGeometry(1,2,0.6)
-
-let material=new THREE.MeshBasicMaterial({
-color:0xdddddd
-})
-
-let body=new THREE.Mesh(geometry,material)
-
-scene.add(body)
-
-camera.position.z=5
-
-function animate(){
-
-requestAnimationFrame(animate)
-
-renderer.render(scene,camera)
-
-}
-
-animate()
-
-function predictSize(){
-
-let chest=document.getElementById("chest").value
-let waist=document.getElementById("waist").value
-let hips=document.getElementById("hips").value
-
-let size="M"
-
-if(chest<90 && waist<75){
-
-size="S"
-
-}
-
-else if(chest>105 || hips>105){
-
-size="L"
-
-}
-
-document.getElementById("result").innerHTML =
-"Recommended Size: "+size
-
-body.scale.x = 1 + chest/200
-body.scale.y = 1 + waist/300
-
-}
-
-function applyClothes(color){
-
-body.material.color.set(color)
-
-}
-
-</script>
-
-</body>
-
-</html> 
+</div
+```
