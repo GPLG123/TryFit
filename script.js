@@ -1,42 +1,53 @@
 // script.js - comun pentru toate paginile
 
-// Avatar 3D (doar pe index.html)
+// Verificăm dacă suntem pe pagina cu avatar
 if(document.getElementById("avatar")){
-    let scene = new THREE.Scene();
-    let camera = new THREE.PerspectiveCamera(75, 400/400, 0.1, 1000);
-    let renderer = new THREE.WebGLRenderer({canvas: document.getElementById("avatar"), alpha: true});
-    renderer.setSize(400, 400);
+    // Creăm scena Three.js
+    const scene = new THREE.Scene();
 
-    let light = new THREE.HemisphereLight(0xffffff, 0x444444);
-    scene.add(light);
+    // Camera
+    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
     camera.position.set(0, 1.5, 3);
 
-    let avatar;
-    let loader = new THREE.GLTFLoader();
+    // Renderer pe canvas-ul existent
+    const renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById("avatar"),
+        alpha: true,
+        antialias: true
+    });
+    renderer.setSize(400, 400);
 
-    console.log("Attempting to load avatar.glb...");
+    // Lumină
+    const light = new THREE.HemisphereLight(0xffffff, 0x444444);
+    scene.add(light);
+
+    // Loader pentru GLB
+    let avatar;
+    const loader = new THREE.GLTFLoader();
+
     loader.load(
-        "avatar.glb",
+        "avatar.glb", // fișierul tău în același folder cu index.html
         function(gltf){
-            console.log("Avatar loaded successfully!", gltf);
             avatar = gltf.scene;
-            avatar.scale.set(1,1,1);
-            avatar.position.y = -0.5;
+            avatar.scale.set(1,1,1);     // ajustează dimensiunea după nevoie
+            avatar.position.y = -0.5;    // ajustează poziția dacă e nevoie
             scene.add(avatar);
+            console.log("Avatar loaded successfully!");
         },
         undefined,
         function(error){
-            console.error("Error loading avatar.glb:", error);
+            console.error("Error loading avatar:", error);
         }
     );
 
-    // Haine demo (cub colorat)
-    let clothesGeometry = new THREE.BoxGeometry(1.2,1.3,0.7);
-    let clothesMaterial = new THREE.MeshBasicMaterial({color:0x3366ff});
-    let clothes = new THREE.Mesh(clothesGeometry, clothesMaterial);
+    // Haine demo (cub)
+    const clothesGeometry = new THREE.BoxGeometry(1.2, 1.3, 0.7);
+    const clothesMaterial = new THREE.MeshBasicMaterial({color: 0x3366ff});
+    const clothes = new THREE.Mesh(clothesGeometry, clothesMaterial);
     clothes.position.y = 1.0;
     scene.add(clothes);
 
+    // Funcție animare
     function animate(){
         requestAnimationFrame(animate);
         if(avatar) avatar.rotation.y += 0.01;
@@ -45,17 +56,17 @@ if(document.getElementById("avatar")){
     }
     animate();
 
-    // Funcție pentru scalarea avatarului după măsuri
+    // Funcție scalare după măsuri
     window.updateAvatar = function(){
-        let chest = parseFloat(document.getElementById("chest").value) || 0;
-        let waist = parseFloat(document.getElementById("waist").value) || 0;
-        let hips = parseFloat(document.getElementById("hips").value) || 0;
-        let size = document.getElementById("size").value;
+        const chest = parseFloat(document.getElementById("chest").value) || 0;
+        const waist = parseFloat(document.getElementById("waist").value) || 0;
+        const hips = parseFloat(document.getElementById("hips").value) || 0;
+        const size = document.getElementById("size").value;
 
         if(avatar){
-            let scaleX = 1 + chest/200;
-            let scaleY = 1 + waist/300;
-            let scaleZ = 1 + hips/200;
+            const scaleX = 1 + chest / 200;
+            const scaleY = 1 + waist / 300;
+            const scaleZ = 1 + hips / 200;
             avatar.scale.set(scaleX, scaleY, scaleZ);
         }
 
@@ -72,45 +83,50 @@ if(document.getElementById("avatar")){
     }
 }
 
+// ------------------- Produse & Cart (pentru toate paginile) -------------------
+
 // Căutare produse
 window.searchProducts = function(){
-    let q = document.getElementById("search")?.value.toLowerCase() || "";
-    let allProducts = document.querySelectorAll('.product');
+    const q = document.getElementById("search")?.value.toLowerCase() || "";
+    const allProducts = document.querySelectorAll('.product');
     allProducts.forEach(p=>{
-        let name = p.querySelector('p').innerText.toLowerCase();
+        const name = p.querySelector('p').innerText.toLowerCase();
         p.style.display = name.includes(q)?'block':'none';
     });
 }
 
-// Funcții Cart
+// Adaugă în cart
 window.addToCart = function(name, price){
-    let cart = JSON.parse(localStorage.getItem('cart'))||[];
-    cart.push({name:name, price:price});
+    const cart = JSON.parse(localStorage.getItem('cart'))||[];
+    cart.push({name, price});
     localStorage.setItem('cart', JSON.stringify(cart));
     alert(name + " added to cart!");
     loadCart();
 }
 
+// Încarcă cart
 window.loadCart = function(){
-    let cart = JSON.parse(localStorage.getItem('cart'))||[];
-    let cartList = document.getElementById('cartList');
+    const cart = JSON.parse(localStorage.getItem('cart'))||[];
+    const cartList = document.getElementById('cartList');
     if(!cartList) return;
     cartList.innerHTML = '';
     let total = 0;
     cart.forEach(item=>{
-        let li = document.createElement('li');
+        const li = document.createElement('li');
         li.innerText = item.name + " - £" + item.price;
         cartList.appendChild(li);
         total += item.price;
     });
-    let totalPrice = document.getElementById('totalPrice');
+    const totalPrice = document.getElementById('totalPrice');
     if(totalPrice) totalPrice.innerText = "Total: £" + total;
 }
 
+// Navigare Checkout
 window.goCheckout = function(){
     window.location.href = "checkout.html";
 }
 
+// Finalizare comandă
 window.finishOrder = function(){
     localStorage.removeItem('cart');
     alert("Order finished! Cart cleared.");
