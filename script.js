@@ -15,13 +15,13 @@ if(document.getElementById("avatar")){
     let avatar;
     let loader = new THREE.GLTFLoader();
 
-    // Încarcă fișierul tău .glb din repository
+    // Încarcă avatarul tău .glb
     loader.load(
-        "avatar.glb",  // fișierul tău .glb încărcat pe GitHub
+        "avatar.glb",
         function(gltf){
             avatar = gltf.scene;
-            avatar.scale.set(1, 1, 1);  // ajustează dacă e prea mare/mic
-            avatar.position.y = 0;      // ajustează poziția dacă e nevoie
+            avatar.scale.set(1, 1, 1);   // ajustează dacă e prea mare/mic
+            avatar.position.y = -0.5;    // ajustează poziția dacă e nevoie
             scene.add(avatar);
         },
         undefined,
