@@ -4,17 +4,16 @@
 <head>
 
 <meta charset="UTF-8">
-<title>TryFit - Virtual Fitting Room</title>
+<title>TryFit - Smart Virtual Fitting</title>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
 
 <style>
 
 body{
-font-family:Arial;
 margin:0;
-background:#f4f4f4;
-text-align:center;
+font-family:Arial;
+background:#f6f6f6;
 }
 
 header{
@@ -22,6 +21,19 @@ background:black;
 color:white;
 padding:20px;
 font-size:28px;
+text-align:center;
+}
+
+nav{
+background:#222;
+color:white;
+padding:10px;
+text-align:center;
+}
+
+nav span{
+margin:0 15px;
+cursor:pointer;
 }
 
 .container{
@@ -31,18 +43,18 @@ justify-content:center;
 padding:20px;
 }
 
-.panel{
+.card{
 background:white;
 padding:20px;
 margin:10px;
-border-radius:8px;
+border-radius:10px;
 box-shadow:0 0 10px rgba(0,0,0,0.1);
 }
 
 input{
-width:200px;
 padding:8px;
 margin:5px;
+width:200px;
 }
 
 button{
@@ -50,25 +62,36 @@ padding:10px 20px;
 background:black;
 color:white;
 border:none;
-margin-top:10px;
 cursor:pointer;
 }
 
 canvas{
-margin-top:10px;
+border:1px solid #ddd;
 }
 
-#result{
-font-size:18px;
-margin-top:10px;
+.products{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
 }
 
 .product{
-margin-top:20px;
+background:white;
+padding:15px;
+margin:10px;
+border-radius:10px;
+box-shadow:0 0 8px rgba(0,0,0,0.1);
+width:200px;
 }
 
 .product img{
-width:120px;
+width:100%;
+border-radius:8px;
+}
+
+#result{
+margin-top:10px;
+font-weight:bold;
 }
 
 </style>
@@ -78,47 +101,55 @@ width:120px;
 <body>
 
 <header>
-TryFit Virtual Fitting
+TryFit
 </header>
+
+<nav>
+<span>Home</span>
+<span>Products</span>
+<span>Virtual Try On</span>
+</nav>
 
 <div class="container">
 
-<div class="panel">
+<div class="card">
 
-<h3>Enter Your Body Measurements</h3>
+<h3>Your Body Measurements</h3>
 
-Height (cm)<br>
+Height<br>
 <input id="height"><br>
 
-Weight (kg)<br>
+Weight<br>
 <input id="weight"><br>
 
-Chest (cm)<br>
+Chest<br>
 <input id="chest"><br>
 
-Waist (cm)<br>
+Waist<br>
 <input id="waist"><br>
 
-Hips (cm)<br>
+Hips<br>
 <input id="hips"><br>
 
-<button onclick="predictSize()">Find My Size</button>
+<button onclick="predictSize()">Find Size</button>
 
 <div id="result"></div>
 
 </div>
 
-<div class="panel">
+<div class="card">
 
-<h3>Your Avatar</h3>
+<h3>TryFit Avatar</h3>
 
-<canvas id="avatar" width="400" height="400"></canvas>
+<canvas id="avatar" width="350" height="350"></canvas>
 
 </div>
 
-<div class="panel">
+</div>
 
-<h3>Example Product</h3>
+<h2 style="text-align:center">Products</h2>
+
+<div class="products">
 
 <div class="product">
 
@@ -126,9 +157,27 @@ Hips (cm)<br>
 
 <p>Classic T-Shirt</p>
 
-<button onclick="applyClothes()">Try On Avatar</button>
+<button onclick="applyClothes(0x3366ff)">Try On</button>
 
 </div>
+
+<div class="product">
+
+<img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f">
+
+<p>Summer Dress</p>
+
+<button onclick="applyClothes(0xff6699)">Try On</button>
+
+</div>
+
+<div class="product">
+
+<img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d">
+
+<p>Casual Hoodie</p>
+
+<button onclick="applyClothes(0x444444)">Try On</button>
 
 </div>
 
@@ -136,28 +185,28 @@ Hips (cm)<br>
 
 <script>
 
-let scene = new THREE.Scene()
+let scene=new THREE.Scene()
 
-let camera = new THREE.PerspectiveCamera(
+let camera=new THREE.PerspectiveCamera(
 75,
-400/400,
+350/350,
 0.1,
 1000
 )
 
-let renderer = new THREE.WebGLRenderer({
+let renderer=new THREE.WebGLRenderer({
 canvas:document.getElementById("avatar")
 })
 
-renderer.setSize(400,400)
+renderer.setSize(350,350)
 
-let geometry = new THREE.BoxGeometry(1,2,0.5)
+let geometry=new THREE.BoxGeometry(1,2,0.6)
 
-let material = new THREE.MeshBasicMaterial({
+let material=new THREE.MeshBasicMaterial({
 color:0xdddddd
 })
 
-let body = new THREE.Mesh(geometry,material)
+let body=new THREE.Mesh(geometry,material)
 
 scene.add(body)
 
@@ -201,9 +250,9 @@ body.scale.y = 1 + waist/300
 
 }
 
-function applyClothes(){
+function applyClothes(color){
 
-body.material.color.set(0x3366ff)
+body.material.color.set(color)
 
 }
 
