@@ -3,33 +3,33 @@
 // Avatar 3D (doar pe index.html)
 if(document.getElementById("avatar")){
     let scene = new THREE.Scene();
-    let camera = new THREE.PerspectiveCamera(75,400/400,0.1,1000);
-    let renderer = new THREE.WebGLRenderer({canvas:document.getElementById("avatar"),alpha:true});
-    renderer.setSize(400,400);
-    let light = new THREE.HemisphereLight(0xffffff,0x444444);
+    let camera = new THREE.PerspectiveCamera(75, 400/400, 0.1, 1000);
+    let renderer = new THREE.WebGLRenderer({canvas: document.getElementById("avatar"), alpha: true});
+    renderer.setSize(400, 400);
+    let light = new THREE.HemisphereLight(0xffffff, 0x444444);
     scene.add(light);
-    camera.position.set(0,1.5,3);
+    camera.position.set(0, 1.5, 3);
 
     let avatar;
     let loader = new THREE.GLTFLoader();
 
-    // Model sigur Three.js Examples (poate fi schimbat ulterior)
+    // Model sigur Three.js (Flamingo pentru test)
     loader.load(
-      "https://threejs.org/examples/models/gltf/Flamingo.glb",
-      function(gltf){
-          avatar = gltf.scene;
-          avatar.scale.set(0.01,0.01,0.01); // micșorăm modelul Flamingo pentru canvas
-          avatar.position.y = -0.5;
-          scene.add(avatar);
-      },
-      undefined,
-      function(error){ console.error("Error loading model:",error); }
+        "https://threejs.org/examples/models/gltf/Flamingo.glb",
+        function(gltf){
+            avatar = gltf.scene;
+            avatar.scale.set(0.01, 0.01, 0.01); // micșorăm modelul Flamingo pentru canvas
+            avatar.position.y = -0.5;
+            scene.add(avatar);
+        },
+        undefined,
+        function(error){ console.error("Error loading model:", error); }
     );
 
     // Haine simple (cub colorat) pentru demo
-    let clothesGeometry = new THREE.BoxGeometry(1.2,1.3,0.7);
-    let clothesMaterial = new THREE.MeshBasicMaterial({color:0x3366ff});
-    let clothes = new THREE.Mesh(clothesGeometry,clothesMaterial);
+    let clothesGeometry = new THREE.BoxGeometry(1.2, 1.3, 0.7);
+    let clothesMaterial = new THREE.MeshBasicMaterial({color: 0x3366ff});
+    let clothes = new THREE.Mesh(clothesGeometry, clothesMaterial);
     clothes.position.y = 1.0;
     scene.add(clothes);
 
@@ -37,29 +37,29 @@ if(document.getElementById("avatar")){
         requestAnimationFrame(animate);
         if(avatar) avatar.rotation.y += 0.01;
         clothes.rotation.y += 0.01;
-        renderer.render(scene,camera);
+        renderer.render(scene, camera);
     }
     animate();
 
     // Funcție pentru scalarea avatarului după măsuri
     window.updateAvatar = function(){
-        let chest = parseFloat(document.getElementById("chest").value)||0;
-        let waist = parseFloat(document.getElementById("waist").value)||0;
-        let hips = parseFloat(document.getElementById("hips").value)||0;
+        let chest = parseFloat(document.getElementById("chest").value) || 0;
+        let waist = parseFloat(document.getElementById("waist").value) || 0;
+        let hips = parseFloat(document.getElementById("hips").value) || 0;
         let size = document.getElementById("size").value;
 
         if(avatar){
-            let scaleX = 1 + chest/200;
-            let scaleY = 1 + waist/300;
-            let scaleZ = 1 + hips/200;
+            let scaleX = 1 + chest / 200;
+            let scaleY = 1 + waist / 300;
+            let scaleZ = 1 + hips / 200;
             avatar.scale.set(scaleX, scaleY, scaleZ);
         }
 
-        if(size=="S") clothes.scale.set(0.9,0.9,0.9);
-        if(size=="M") clothes.scale.set(1,1,1);
-        if(size=="L") clothes.scale.set(1.15,1.15,1.15);
+        if(size == "S") clothes.scale.set(0.9, 0.9, 0.9);
+        if(size == "M") clothes.scale.set(1, 1, 1);
+        if(size == "L") clothes.scale.set(1.15, 1.15, 1.15);
 
-        document.getElementById("result").innerHTML = "Avatar updated for size: "+size;
+        document.getElementById("result").innerHTML = "Avatar updated for size: " + size;
     }
 
     // Funcție schimbare culoare haine
@@ -81,7 +81,7 @@ window.searchProducts = function(){
 // Funcții Cart
 window.addToCart = function(name, price){
     let cart = JSON.parse(localStorage.getItem('cart'))||[];
-    cart.push({name:name, price:price});
+    cart.push({name: name, price: price});
     localStorage.setItem('cart', JSON.stringify(cart));
     alert(name + " added to cart!");
     loadCart();
@@ -100,7 +100,7 @@ window.loadCart = function(){
         total += item.price;
     });
     let totalPrice = document.getElementById('totalPrice');
-    if(totalPrice) totalPrice.innerText = "Total: £"+total;
+    if(totalPrice) totalPrice.innerText = "Total: £" + total;
 }
 
 window.goCheckout = function(){
