@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<title>TryFit - Virtual Fitting Room</title>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#f4f4f4;
+text-align:center;
+}
+
+header{
+background:black;
+color:white;
+padding:20px;
+font-size:28px;
+}
+
+.container{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+padding:20px;
+}
+
+.panel{
+background:white;
+padding:20px;
+margin:10px;
+border-radius:8px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+input{
+width:200px;
+padding:8px;
+margin:5px;
+}
+
+button{
+padding:10px 20px;
+background:black;
+color:white;
+border:none;
+margin-top:10px;
+cursor:pointer;
+}
+
+canvas{
+margin-top:10px;
+}
+
+#result{
+font-size:18px;
+margin-top:10px;
+}
+
+.product{
+margin-top:20px;
+}
+
+.product img{
+width:120px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+TryFit Virtual Fitting
+</header>
+
+<div class="container">
+
+<div class="panel">
+
+<h3>Enter Your Body Measurements</h3>
+
+Height (cm)<br>
+<input id="height"><br>
+
+Weight (kg)<br>
+<input id="weight"><br>
+
+Chest (cm)<br>
+<input id="chest"><br>
+
+Waist (cm)<br>
+<input id="waist"><br>
+
+Hips (cm)<br>
+<input id="hips"><br>
+
+<button onclick="predictSize()">Find My Size</button>
+
+<div id="result"></div>
+
+</div>
+
+<div class="panel">
+
+<h3>Your Avatar</h3>
+
+<canvas id="avatar" width="400" height="400"></canvas>
+
+</div>
+
+<div class="panel">
+
+<h3>Example Product</h3>
+
+<div class="product">
+
+<img src="https://images.unsplash.com/photo-1520975928318-8b3d7c5b3a7e">
+
+<p>Classic T-Shirt</p>
+
+<button onclick="applyClothes()">Try On Avatar</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let scene = new THREE.Scene()
+
+let camera = new THREE.PerspectiveCamera(
+75,
+400/400,
+0.1,
+1000
+)
+
+let renderer = new THREE.WebGLRenderer({
+canvas:document.getElementById("avatar")
+})
+
+renderer.setSize(400,400)
+
+let geometry = new THREE.BoxGeometry(1,2,0.5)
+
+let material = new THREE.MeshBasicMaterial({
+color:0xdddddd
+})
+
+let body = new THREE.Mesh(geometry,material)
+
+scene.add(body)
+
+camera.position.z=5
+
+function animate(){
+
+requestAnimationFrame(animate)
+
+renderer.render(scene,camera)
+
+}
+
+animate()
+
+function predictSize(){
+
+let chest=document.getElementById("chest").value
+let waist=document.getElementById("waist").value
+let hips=document.getElementById("hips").value
+
+let size="M"
+
+if(chest<90 && waist<75){
+
+size="S"
+
+}
+
+else if(chest>105 || hips>105){
+
+size="L"
+
+}
+
+document.getElementById("result").innerHTML =
+"Recommended Size: "+size
+
+body.scale.x = 1 + chest/200
+body.scale.y = 1 + waist/300
+
+}
+
+function applyClothes(){
+
+body.material.color.set(0x3366ff)
+
+}
+
+</script>
+
+</body>
+
+</html> 
